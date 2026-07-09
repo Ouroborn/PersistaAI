@@ -1,6 +1,6 @@
-import os
 import logging
 import asyncio
+from core.config import BOT_TOKEN, GEMINI_API
 
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
@@ -11,14 +11,8 @@ from aiogram.fsm.storage.memory import MemoryStorage
 
 from google import genai
 
-from dotenv import load_dotenv
 
 logging.basicConfig(level=logging.INFO)
-
-
-load_dotenv()
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-GEMINI_API = os.getenv("GEMINI_API")
 
 client = genai.Client(api_key=GEMINI_API)
 
