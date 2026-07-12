@@ -8,7 +8,6 @@ from handlers.menu import menu_router
 
 from google import genai
 
-
 logging.basicConfig(level=logging.INFO)
 
 client = genai.Client(api_key=GEMINI_API)
