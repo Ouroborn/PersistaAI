@@ -10,6 +10,7 @@ class UserModel:
     api_key: Optional[str]
     long_memory: bool
     last_character_id: Optional[int]
+    is_admin: bool
 
 @dataclass
 class CharacterModel:

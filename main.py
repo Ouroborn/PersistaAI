@@ -4,6 +4,7 @@ from core.config import BOT_TOKEN, GEMINI_API
 
 from aiogram import Bot, Dispatcher, F
 from handlers.menu import menu_router
+from handlers.chat import chat_router
 
 
 from google import genai
@@ -22,6 +23,7 @@ dp = Dispatcher()
 
 async def main():
     dp.include_router(menu_router)
+    dp.include_router(chat_router)
 
     await dp.start_polling(bot)
 
