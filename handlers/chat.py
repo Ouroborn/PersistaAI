@@ -3,7 +3,7 @@ from handlers.keyboards import get_main_menu_keyboard
 from handlers.states import BotStates
 
 from aiogram import Router, F
-from aiogram.types import Message, KeyboardButton, ReplyKeyboardMarkup, reply_keyboard_markup
+from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 
 chat_router = Router()
@@ -15,10 +15,11 @@ async def char_settings(message: Message):
     )
 
 @chat_router.message(BotStates.chatting, F.text == ChatTexts.EXIT_CHAT)
-async def exit_chat(message: Message, state: FSMContext):
+async def go_to_main_menu(message: Message, state: FSMContext, text):
     await state.set_state(BotStates.main_menu)
+    text = 'Возвращение в главное меню'
 
     await message.answer(
-        "Возвращение в главное меню",
+        text,
         reply_markup=get_main_menu_keyboard()
     )

@@ -1,6 +1,7 @@
 from core.lexicon import BotMessages, MenuTexts
-from handlers.keyboards import get_chat_menu_keyboard, get_main_menu_keyboard
-from handlers.states import BotStates
+from handlers.keyboards import get_cancel_kb
+from handlers.keyboards import get_chat_menu_keyboard, get_main_menu_keyboard, get_create_character_keyboard
+from handlers.states import BotStates, CharacterCreation
 from database.requests import get_or_create_user, get_last_character_id, get_active_character_name
 
 from aiogram import Router, F
@@ -16,7 +17,7 @@ async def process_chat(message: Message, state: FSMContext):
     last_character_id = await get_last_character_id(user_id)
 
     if last_character_id is None:
-        await message.answer("У вас не выбран активный персонаж. Выберите персонажа")
+        await message.answer(BotMessages.ERROR_NO_CHAR)
         return
 
     await state.set_state(BotStates.chatting)
@@ -24,9 +25,16 @@ async def process_chat(message: Message, state: FSMContext):
         BotMessages.START_CHAT,
         reply_markup=get_chat_menu_keyboard())
 
-@menu_router.message(BotStates.main_menu, F.text == MenuTexts.SETTINGS)
-async def process_settings(message: Message):
-    await message.answer(BotMessages.SETTINGS_OPEN)
+
+@menu_router.message(BotStates.main_menu, F.text == MenuTexts.CREATE_CHAR)
+async def start_character_creation(message: Message, state: FSMContext):
+    await state.set_state(CharacterCreation.waiting_for_name)
+    await message.answer(
+        "<b>Шаг 1:</b> Как будут звать твоего персонажа?\n"
+        "<i>Лимит: до 30 символов.</i>",
+        reply_markup=get_cancel_kb(),
+        parse_mode="HTML"
+    )
 
 
 # /start
