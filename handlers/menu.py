@@ -1,6 +1,6 @@
 from core.lexicon import BotMessages, MenuTexts
-from handlers.keyboards import get_cancel_kb
-from handlers.keyboards import get_chat_menu_keyboard, get_main_menu_keyboard, get_create_character_keyboard
+from utils.keyboards import get_cancel_kb
+from utils.keyboards import get_chat_menu_keyboard, get_main_menu_keyboard
 from handlers.states import BotStates, CharacterCreation
 from database.requests import get_or_create_user, get_last_character_id, get_active_character_name
 

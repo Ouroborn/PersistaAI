@@ -1,5 +1,5 @@
 from core.lexicon import ChatTexts, BotMessages
-from handlers.keyboards import get_main_menu_keyboard
+from utils.keyboards import get_main_menu_keyboard
 from handlers.states import BotStates
 
 from aiogram import Router, F

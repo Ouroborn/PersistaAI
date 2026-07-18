@@ -1,5 +1,8 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+
 from core.lexicon import MenuTexts, ChatTexts, CreateCharacterTexts
+from utils.callbacks import CharacterCB
 
 
 def get_main_menu_keyboard() -> ReplyKeyboardMarkup:
@@ -61,3 +64,40 @@ def get_confirm_kb() -> ReplyKeyboardMarkup:
         ],
         resize_keyboard=True
     )
+
+
+def get_characters_kb(characters: list, page: int = 0, per_page: int = 5) -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+
+    # Высчитываем индексы для среза списка
+    start = page * per_page
+    end = start + per_page
+    page_chars = characters[start:end]
+
+    # Добавляем кнопки с персонажами
+    for char in page_chars:
+        builder.button(
+            text=char['name'],
+            callback_data=CharacterCB(action='select', char_id=char['id'], page=page)
+        )
+    builder.adjust(1)  # По одной кнопке в ряд
+
+    # Строим кнопки пагинации, если персонажей больше, чем влазит на экран
+    nav_buttons = []
+    if page > 0:
+        nav_buttons.append(builder.button(
+            text="⬅️",
+            callback_data=CharacterCB(action='list', page=page - 1)
+        ))
+
+    if end < len(characters):
+        nav_buttons.append(builder.button(
+            text="➡️",
+            callback_data=CharacterCB(action='list', page=page + 1)
+        ))
+
+    # Если добавили стрелочки, выравниваем их в один ряд внизу
+    if nav_buttons:
+        builder.adjust(1, *([len(nav_buttons)]))  # Сначала по 1 в ряд, последняя строка - по кол-ву кнопок навигации
+
+    return builder.as_markup()

@@ -2,19 +2,16 @@ import html
 
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import Message
 
 from database.client import supabase_client
 from handlers.chat import go_to_main_menu
-from handlers.keyboards import get_confirm_kb, get_skip_kb
+from utils.keyboards import get_confirm_kb, get_skip_kb
 from handlers.states import CharacterCreation
 from services.ai_service import generate_missing_fields
 
 creation_router = Router()
 
-# ==========================================
-#         ГЛОБАЛЬНЫЙ ХЭНДЛЕР ОТМЕНЫ
-# ==========================================
 @creation_router.message(CharacterCreation(), F.text.in_({"❌ Отмена", "❌ Сбросить и отменить"}))
 async def cancel_creation_handler(message: Message, state: FSMContext):
     await go_to_main_menu(message, state, text="Создание персонажа прервано. Возвращаюсь в главное меню. ↩️")
@@ -31,7 +28,7 @@ async def process_name(message: Message, state: FSMContext):
     if message.text is None: return  # Защита для PyCharm
 
     if len(message.text) > 30:
-        await message.answer(f"⚠️ Имя слишком длинное ({len(message.text)}/30 симв.). Придумай покороче!")
+        await message.answer(f"⚠️ Имя слишком длинное ({len(message.text)}/30 симв.)")
         return
 
     await state.update_data(name=message.text)
@@ -51,7 +48,7 @@ async def process_personality(message: Message, state: FSMContext):
     if message.text is None: return
 
     if len(message.text) > 600:
-        await message.answer(f"⚠️ Описание слишком раздуто ({len(message.text)}/600 симв.). Сократи немного!")
+        await message.answer(f"⚠️ Описание слишком раздуто ({len(message.text)}/600 симв.)")
         return
 
     await state.update_data(personality=message.text)
@@ -59,7 +56,7 @@ async def process_personality(message: Message, state: FSMContext):
     await message.answer(
         "Характер зафиксирован! 🧠\n\n"
         "<b>Шаг 3:</b> Пришли примеры реплик, чтобы задать манеру речи.\n"
-        "<i>Или нажми кнопку ниже, чтобы ИИ придумал их сам!</i> 👇",
+        "<i>Или нажми кнопку ниже, чтобы ИИ придумал их сам</i>",
         # Меняем клавиатуру на клавиатуру с пропуском
         reply_markup=get_skip_kb(),
         parse_mode="HTML"
@@ -80,7 +77,7 @@ async def process_examples(message: Message, state: FSMContext):
     await message.answer(
         "Принято! 💬\n\n"
         "<b>Шаг 4:</b> Напиши приветственную фразой персонажа.\n"
-        "<i>Или нажми кнопку ниже, чтобы доверить это ИИ!</i> 👇",
+        "<i>Или нажми кнопку ниже, чтобы доверить это ИИ!</i>",
         reply_markup=get_skip_kb(),
         parse_mode="HTML"
     )
@@ -132,7 +129,7 @@ async def process_greeting(message: Message, state: FSMContext):
 
     # Показываем красивое превью (в котором уже точно всё заполнено!)
     preview_text = (
-        "✨ <b>ПРЕВЬЮ ПЕРСОНАЖА</b> ✨\n\n"
+        "==<b>ПРЕВЬЮ ПЕРСОНАЖА</b>==\n\n"
         f"👤 <b>Имя:</b> {safe_name}\n"
         f"📝 <b>Характер:</b> {safe_personality}\n\n"
         f"💬 <b>Примеры общения:</b>\n<code>{safe_examples}</code>\n\n"
@@ -152,7 +149,6 @@ async def process_confirmation(message: Message, state: FSMContext):
     user_data = await state.get_data()
 
     try:
-        # Собираем итоговую структуру данных
         payload = {
             "user_id": message.from_user.id,
             "name": user_data["name"],
